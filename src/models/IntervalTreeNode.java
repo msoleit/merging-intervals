@@ -2,9 +2,9 @@ package models;
 
 public class IntervalTreeNode {
     
-    Interval interval;
-    IntervalTreeNode left;
-    IntervalTreeNode right;
+    public Interval interval;
+    public IntervalTreeNode left;
+    public IntervalTreeNode right;
     boolean color;     // color of parent link
     int size;          // subtree count
     

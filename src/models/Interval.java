@@ -1,6 +1,6 @@
 package models;
 
-public class Interval {
+public class Interval implements Comparable<Interval> {
    private static final int MERGE_DISTANCE = 5;
    int start;
    int end;
@@ -17,5 +17,16 @@ public class Interval {
 		    return true;
 	   return false; 
 	}
+
+@Override
+public int compareTo(Interval o) {
+	// TODO Auto-generated method stub
+//	if(this.equals(o)) return 0;
+	return this.start - o.start;
+}
+
+public boolean equals(Interval o) {
+	return (this.start == o.start && this.end == o.end);
+}
    
 }

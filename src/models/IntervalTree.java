@@ -249,6 +249,7 @@ public class IntervalTree {
 			}
 		}
 		if (splittedIntervals.isEmpty()) splittedIntervals.add(interval);
+		//System.out.println(splittedIntervals);
 		return splittedIntervals;
 	}
 
@@ -349,21 +350,25 @@ public class IntervalTree {
 		root = remove(root, key);
 		if (!isEmpty())
 			root.color = BLACK;
-		updateDisjointIntervals();
+	     this.updateDisjointIntervals();
 		// assert check();
+	}
+	public void removeAndUpdate(Interval i) {
+		this.remove(i);
+		this.updateDisjointIntervals();
 	}
 
 	private void updateDisjointIntervals() {
 		// TODO Auto-generated method stub
-		this.disjointIntervals = mergeOverlappingIntervals(root);
+		this.disjointIntervals = mergeOverlappingIntervals();
 	}
 	
 
-	private List<Interval> mergeOverlappingIntervals(IntervalTreeNode r) {
+	private List<Interval> mergeOverlappingIntervals() {
 		// TODO Auto-generated method stub
 		List<Interval> mergedIntervals = new ArrayList<>();
-		if(r == null) return mergedIntervals;
-		reverseOrder(r, mergedIntervals);
+		if(this.root == null) return mergedIntervals;
+		reverseOrder(this.root, mergedIntervals);
 		//System.out.println(mergedIntervals);
 		int index = 0;
 	    for (int i=0; i<mergedIntervals.size(); i++) 
@@ -374,9 +379,13 @@ public class IntervalTree {
 	        { 
 	            while (index != 0 && mergedIntervals.get(index-1).doOverlap(mergedIntervals.get(i))) 
 	            { 
-	                // Merge previous and current Intervals 
-	                mergedIntervals.get(index - 1).end = Math.max(mergedIntervals.get(index - 1).end, mergedIntervals.get(i).end); 
-	                mergedIntervals.get(index - 1).start = Math.min(mergedIntervals.get(index - 1).start, mergedIntervals.get(i).start); 
+	                // Merge previous and current Intervals
+//	            	System.out.println(index);
+//	            	System.out.println("while");
+	            	Interval temp = new Interval();
+	                temp.end = Math.max(mergedIntervals.get(index - 1).end, mergedIntervals.get(i).end); 
+	                temp.start = Math.min(mergedIntervals.get(index - 1).start, mergedIntervals.get(i).start);
+	                mergedIntervals.set(index-1, temp);
 	                index--; 
 	            } 
 	        } 
@@ -390,6 +399,7 @@ public class IntervalTree {
 //	    System.out.println(mergedIntervals.subList(0,index));
 	    mergedIntervals =  mergedIntervals.subList(0,index);
 	    Collections.reverse(mergedIntervals);
+	   // System.out.println(mergedIntervals);
 	    return deleteBlocksIfNeeded(mergedIntervals);
 	}
 
@@ -404,7 +414,7 @@ public class IntervalTree {
 	// delete the key-value pair with the given key rooted at h
 	private IntervalTreeNode remove(IntervalTreeNode h, Interval key) {
 		// assert get(h, key) != null;
-
+        
 		if (key.compareTo(h.interval) < 0) {
 			if (!isRed(h.left) && !isRed(h.left.left))
 				h = moveRedLeft(h);

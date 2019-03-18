@@ -20,21 +20,12 @@ public class Driver {
 			switch(action) {
 			case "ADDED" : 
 				tree.put(new Interval(start, end));
-//				print(tree.getDisJointIntervals());
-//				System.out.print('\n');
-				//inorder(tree.root);
 			    break;
 			case "REMOVED" :
 				tree.remove(new Interval(start,end));
-//				print(tree.getDisJointIntervals());
-//				System.out.print('\n');
-				//inorder(tree.root);
 				break;
 			case "DELETED" :
 				tree.delete(new Interval(start, end));
-//				print(tree.getDisJointIntervals());
-//				System.out.print('\n');
-				//inorder(tree.root);
 	            break;
 			}
 			print(tree.getDisJointIntervals());
@@ -69,6 +60,8 @@ public class Driver {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		//inorder(tree.root);
+		//System.out.println(tree.deletedBlocks);
 	}
 
 }

@@ -46,9 +46,22 @@ public String toString() {
 
 public boolean exactOverlap(Interval i) {
 	// TODO Auto-generated method stub
-	if (this.start <= i.end && i.start <= this.end) 
-        return true; 
-	return false;
+	return this.intersects(i);
+}
+public boolean contains(Interval i) {
+	return (this.start <= i.start && this.end >= i.end);
+}
+public boolean isContainedIn(Interval i) {
+	return i.contains(this);
+}
+public boolean intersects(Interval i) {
+	return (this.start <= i.end && i.start <= this.end);
+}
+public boolean after(Interval i) {
+	return (this.start > i.end);
+}
+public boolean before(Interval i) {
+	return (this.end < i.start);
 }
    
 }

@@ -15,11 +15,7 @@ public class Interval implements Comparable<Interval> {
 }
 
 public boolean doOverlap(Interval i) {
-	   if (this.exactOverlap(i)) 
-	        return true; 
-	   if(this.withinMergeDistance(i))
-		    return true;
-	   return false; 
+	   return this.exactOverlap(i) || this.withinMergeDistance(i);
 	}
 public boolean withinMergeDistance(Interval i) {
 	if(this.start - i.end >= 0 && this.start - i.end <= Interval.MERGE_DISTANCE || i.start - this.end >= 0 && i.start - this.end <= Interval.MERGE_DISTANCE)

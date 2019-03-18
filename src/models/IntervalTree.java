@@ -26,13 +26,6 @@ public class IntervalTree {
 		return this.disjointIntervals;
 	}
 
-	/**
-	 * Initializes an empty symbol table.
-	 */
-
-	/***************************************************************************
-	 * Node helper methods.
-	 ***************************************************************************/
 	// is node x red; false if x is null ?
 	private boolean isRed(IntervalTreeNode x) {
 		if (x == null)
@@ -47,37 +40,14 @@ public class IntervalTree {
 		return x.size;
 	}
 
-	/**
-	 * Returns the number of key-value pairs in this symbol table.
-	 * 
-	 * @return the number of key-value pairs in this symbol table
-	 */
 	public int size() {
 		return size(root);
 	}
 
-	/**
-	 * Is this symbol table empty?
-	 * 
-	 * @return {@code true} if this symbol table is empty and {@code false}
-	 *         otherwise
-	 */
 	public boolean isEmpty() {
 		return root == null;
 	}
 
-	/***************************************************************************
-	 * Standard BST search.
-	 ***************************************************************************/
-
-	/**
-	 * Returns the value associated with the given key.
-	 * 
-	 * @param key the key
-	 * @return the value associated with the given key if the key is in the symbol
-	 *         table and {@code null} if the key is not in the symbol table
-	 * @throws IllegalArgumentException if {@code key} is {@code null}
-	 */
 	public IntervalTreeNode get(Interval i) {
 		if (i == null)
 			throw new IllegalArgumentException("argument to get() is null");
@@ -86,9 +56,9 @@ public class IntervalTree {
 
 	// value associated with the given key in subtree rooted at x; null if no such
 	// key
-	private IntervalTreeNode get(IntervalTreeNode x, Interval key) {
+	private IntervalTreeNode get(IntervalTreeNode x, Interval i) {
 		while (x != null) {
-			int cmp = key.compareTo(x.interval);
+			int cmp = i.compareTo(x.interval);
 			if (cmp < 0)
 				x = x.left;
 			else if (cmp > 0)
@@ -99,38 +69,16 @@ public class IntervalTree {
 		return null;
 	}
 
-	/**
-	 * Does this symbol table contain the given key?
-	 * 
-	 * @param key the key
-	 * @return {@code true} if this symbol table contains {@code key} and
-	 *         {@code false} otherwise
-	 * @throws IllegalArgumentException if {@code key} is {@code null}
-	 */
-	public boolean contains(Interval key) {
-		return get(key) != null;
+	public boolean contains(Interval i) {
+		return get(i) != null;
 	}
 
-	/***************************************************************************
-	 * Red-black tree insertion.
-	 ***************************************************************************/
-
-	/**
-	 * Inserts the specified key-value pair into the symbol table, overwriting the
-	 * old value with the new value if the symbol table already contains the
-	 * specified key. Deletes the specified key (and its associated value) from this
-	 * symbol table if the specified value is {@code null}.
-	 *
-	 * @param key the key
-	 * @param val the value
-	 * @throws IllegalArgumentException if {@code key} is {@code null}
-	 */
 	public void put(Interval i) {
 		if (i == null)
 			throw new IllegalArgumentException("first argument to put() is null");
 		root = put(root, i);
 		root.color = BLACK;
-		// assert check();
+		assert check();
 	}
 
 	// insert the key-value pair in the subtree rooted at h

@@ -11,7 +11,6 @@ public class Interval implements Comparable<Interval> {
    }
    
    public Interval() {
-	// TODO Auto-generated constructor stub
 }
 
 public boolean doOverlap(Interval i) {
@@ -24,7 +23,6 @@ public boolean withinMergeDistance(Interval i) {
 }
 @Override
 public int compareTo(Interval o) {
-	// TODO Auto-generated method stub
     if(this.equals(o)) return 0;
     if(this.start != o.start) return (this.start - o.start);
     return (this.end - o.end);
@@ -45,7 +43,6 @@ public String toString() {
 }
 
 public boolean exactOverlap(Interval i) {
-	// TODO Auto-generated method stub
 	return this.intersects(i);
 }
 public boolean contains(Interval i) {

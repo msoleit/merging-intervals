@@ -53,47 +53,45 @@ public class IntervalTree {
 	}
 
 	private List<Interval> insert(List<Interval> disjointIntervals, Interval newInterval) {
-		ArrayList<Interval> ans = new ArrayList<>();
+		ArrayList<Interval> updated = new ArrayList<>();
 		int n = disjointIntervals.size();
 		if (n == 0) {
-			ans.add(newInterval);
-			return deleteBlocksIfNeeded(ans);
+			updated.add(newInterval);
+			return deleteBlocksIfNeeded(updated);
 		}
 		// Case 1 & 2 : new interval is before all intervals or after all intervals
 		// without any overlap
-		if (newInterval.end < disjointIntervals.get(0).start && !newInterval.doOverlap(disjointIntervals.get(0))
-				|| newInterval.start > disjointIntervals.get(n - 1).end
+		if (newInterval.isBefore(disjointIntervals.get(0)) && !newInterval.doOverlap(disjointIntervals.get(0))
+				|| newInterval.isAfter(disjointIntervals.get(n - 1))
 						&& !newInterval.doOverlap(disjointIntervals.get(n - 1))) {
-			if (newInterval.end < disjointIntervals.get(0).start)
-				ans.add(newInterval);
+			if (newInterval.isBefore(disjointIntervals.get(0)))
+				updated.add(newInterval);
 
 			for (int i = 0; i < n; i++)
-				ans.add(disjointIntervals.get(i));
+				updated.add(disjointIntervals.get(i));
 
-			if (newInterval.start > disjointIntervals.get(n - 1).end)
-				ans.add(newInterval);
+			if (newInterval.isAfter(disjointIntervals.get(n - 1)))
+				updated.add(newInterval);
 
-			return deleteBlocksIfNeeded(ans);
+			return deleteBlocksIfNeeded(updated);
 		}
 
 		// Case 3 : new interval covers all existing intervals
-		if (newInterval.start <= disjointIntervals.get(0).start
-				&& newInterval.end >= disjointIntervals.get(n - 1).end) {
-			ans.add(newInterval);
-			return deleteBlocksIfNeeded(ans);
+		if (newInterval.contains(disjointIntervals.get(0)) && newInterval.contains(disjointIntervals.get(n - 1))) {
+			updated.add(newInterval);
+			return deleteBlocksIfNeeded(updated);
 		}
 		boolean overlap = true;
 		for (int i = 0; i < n; i++) {
 			overlap = disjointIntervals.get(i).doOverlap(newInterval);
 			if (!overlap) {
-				ans.add(disjointIntervals.get(i));
+				updated.add(disjointIntervals.get(i));
 
 				// Case 4 : To check if given interval
 				// lies between two intervals.
-				if (i < n && newInterval.after(disjointIntervals.get(i))
-						&& newInterval.before(disjointIntervals.get(i + 1)))
-					ans.add(newInterval);
-
+				if (i < n && newInterval.isAfter(disjointIntervals.get(i))
+						&& newInterval.isBefore(disjointIntervals.get(i + 1)))
+					updated.add(newInterval);
 				continue;
 			}
 			Interval temp = new Interval();
@@ -113,9 +111,9 @@ public class IntervalTree {
 			}
 
 			i--;
-			ans.add(temp);
+			updated.add(temp);
 		}
-		return deleteBlocksIfNeeded(ans);
+		return deleteBlocksIfNeeded(updated);
 	}
 
 	private List<Interval> deleteBlocksIfNeeded(List<Interval> intervals) {
@@ -182,5 +180,4 @@ public class IntervalTree {
 		Collections.reverse(mergedIntervals);
 		return deleteBlocksIfNeeded(mergedIntervals);
 	}
-
 }

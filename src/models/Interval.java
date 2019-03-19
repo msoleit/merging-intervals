@@ -54,11 +54,11 @@ public boolean isContainedIn(Interval i) {
 public boolean intersects(Interval i) {
 	return (this.start <= i.end && i.start <= this.end);
 }
-public boolean after(Interval i) {
+public boolean isAfter(Interval i) {
 	return (this.start > i.end);
 }
-public boolean before(Interval i) {
-	return (this.end < i.start);
+public boolean isBefore(Interval i) {
+	return i.isAfter(this);
 }
    
 }

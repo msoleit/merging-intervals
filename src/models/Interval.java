@@ -1,7 +1,7 @@
 package models;
 
 public class Interval implements Comparable<Interval> {
-   private static final int MERGE_DISTANCE = 7;
+   private static final int MERGE_DISTANCE = 1;
    int start;
    int end;
    

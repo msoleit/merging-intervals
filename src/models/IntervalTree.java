@@ -136,7 +136,7 @@ public class IntervalTree {
 				updated.addAll(splitInterval(intervals.get(intervalIndex), deleted.get(deletedIndex)));
 				deletedIndex++;
 				intervalIndex++;
-				while (deletedIndex < deleted.size() && updated.peek().exactOverlap(deleted.get(deletedIndex))) {
+				while (deletedIndex < deleted.size() && !updated.empty() && updated.peek().exactOverlap(deleted.get(deletedIndex))) {
 					updated.addAll(splitInterval(updated.pop(), deleted.get(deletedIndex)));
 					deletedIndex++;
 				}
@@ -161,6 +161,7 @@ public class IntervalTree {
 
 	private List<Interval> splitInterval(Interval interval, Interval block) {
 		List<Interval> splittedIntervals = new ArrayList<>();
+		if(interval.equals(block)) return splittedIntervals;
 		if (interval.start >= block.start)
 			splittedIntervals.add(new Interval(block.end, interval.end));
 		else if (interval.end <= block.end)

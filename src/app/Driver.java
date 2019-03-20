@@ -42,6 +42,8 @@ public class Driver {
 		System.out.print('\n');
 	}
 	public static void main(String[] args) {
+		
+		// Your input file goes here, see an example under in resources/intervals.txt
 		String fileName = "C:\\Users\\esloohm\\Documents\\workspace-sts-3.9.7.RELEASE\\merging-intervals\\src\\resources\\intervals.txt";
 
 		//read file into stream, try-with-resources

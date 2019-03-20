@@ -40,6 +40,7 @@ public class IntervalTree {
 
 	// Delete an interval block from the disjoint intervals set
 	public void delete(Interval interval) {
+		//this.intervals.remove(interval);
 		this.deletedBlocks.add(interval);
 		this.disjointIntervals = deleteBlocksIfNeeded(this.disjointIntervals);
 	}
@@ -126,7 +127,7 @@ public class IntervalTree {
 		Stack<Interval> splitted = new Stack<>();
 		splitted.push(interval);
 		for (Interval block : deletedBlocks) {
-			if (splitted.peek().exactOverlap(block)) {
+			if (!splitted.empty() && splitted.peek().exactOverlap(block)) {
 				splitted.addAll(splitInterval(splitted.pop(), block));
 			}
 		}
@@ -135,7 +136,8 @@ public class IntervalTree {
 
 	private List<Interval> splitInterval(Interval interval, Interval block) {
 		List<Interval> splittedIntervals = new ArrayList<>();
-		if (interval.start >= block.start)
+		if(interval.equals(block)) return splittedIntervals;
+		else if (interval.start >= block.start)
 			splittedIntervals.add(new Interval(block.end, interval.end));
 		else if (interval.end <= block.end)
 			splittedIntervals.add(new Interval(interval.start, block.start));

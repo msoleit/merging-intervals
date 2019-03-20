@@ -2,22 +2,20 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.Stack;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import utilities.IntervalsUtilities;
 
 public class IntervalTree {
 
 	List<Interval> disjointIntervals;
-	public TreeSet<Interval> deletedBlocks;
+	public List<Interval> deletedBlocks;
 	public TreeSet<Interval> intervals;
 
 	public IntervalTree() {
 		this.disjointIntervals = new ArrayList<>();
-		this.deletedBlocks = new TreeSet<>();
+		this.deletedBlocks = new ArrayList<>();
 		this.intervals = new TreeSet<>();
 	}
 
@@ -28,183 +26,35 @@ public class IntervalTree {
 	// Add an interval to the tree
 	public void add(Interval i) {
 		intervals.add(i);
-		updateDeletedBlocks(i);
+		//updateDeletedBlocks(i);
 		addToDisjointIntervals(i);
 	}
 
 	// Remove an interval from the original stream
 	public void remove(Interval i) {
 		intervals.remove(i);
-		this.updateDisjointIntervals();
+		updateDisjointIntervals();
 	}
 
 	// Delete an interval block from the disjoint intervals set
-	public void delete(Interval interval) {
-		this.deletedBlocks.add(interval);
-		this.disjointIntervals = deleteBlocksIfNeeded(this.disjointIntervals);
+	public void delete(Interval i) {
+		this.deletedBlocks = IntervalsUtilities.insertInSortedDisjointIntervals(this.deletedBlocks, i, false);
+		this.disjointIntervals = IntervalsUtilities.deleteBlockFromDisjointIntervals(this.disjointIntervals, i);
 	}
 
 	private void updateDeletedBlocks(Interval i) {
 		// if deleted blocks can be overwritten do it here
-		this.deletedBlocks = this.deletedBlocks.stream().filter(block -> !i.contains(block)).flatMap(block -> {
-			return block.exactOverlap(i) ? splitInterval(block, i).stream()
-					: new ArrayList<>(Arrays.asList(block)).stream();
-		}).collect(Collectors.toCollection(TreeSet::new));
-	}
-
-	private List<Interval> insert(List<Interval> disjointIntervals, Interval newInterval) {
-		ArrayList<Interval> updated = new ArrayList<>();
-		int n = disjointIntervals.size();
-		if (n == 0) {
-			updated.add(newInterval);
-			return deleteBlocksIfNeeded(updated);
-		}
-		// Case 1 & 2 : new interval is before all intervals or after all intervals
-		// without any overlap
-		if (newInterval.isBefore(disjointIntervals.get(0)) && !newInterval.doOverlap(disjointIntervals.get(0))
-				|| newInterval.isAfter(disjointIntervals.get(n - 1))
-						&& !newInterval.doOverlap(disjointIntervals.get(n - 1))) {
-			if (newInterval.isBefore(disjointIntervals.get(0)))
-				updated.add(newInterval);
-
-			for (int i = 0; i < n; i++)
-				updated.add(disjointIntervals.get(i));
-
-			if (newInterval.isAfter(disjointIntervals.get(n - 1)))
-				updated.add(newInterval);
-
-			return deleteBlocksIfNeeded(updated);
-		}
-
-		// Case 3 : new interval covers all existing intervals
-		if (newInterval.contains(disjointIntervals.get(0)) && newInterval.contains(disjointIntervals.get(n - 1))) {
-			updated.add(newInterval);
-			return deleteBlocksIfNeeded(updated);
-		}
-		boolean overlap = true;
-		for (int i = 0; i < n; i++) {
-			overlap = disjointIntervals.get(i).doOverlap(newInterval);
-			if (!overlap) {
-				updated.add(disjointIntervals.get(i));
-
-				// Case 4 : To check if given interval
-				// lies between two intervals.
-				if (i < n && newInterval.isAfter(disjointIntervals.get(i))
-						&& newInterval.isBefore(disjointIntervals.get(i + 1)))
-					updated.add(newInterval);
-				continue;
-			}
-			Interval temp = new Interval();
-			temp.start = Math.min(newInterval.start, disjointIntervals.get(i).start);
-			// Traverse the set until intervals are not overlapping
-			while (i < n && overlap) {
-
-				// Ending time of new merged interval
-				// is maximum of ending time both
-				// overlapping intervals.
-				temp.end = Math.max(newInterval.end, disjointIntervals.get(i).end);
-				if (i == n - 1)
-					overlap = false;
-				else
-					overlap = disjointIntervals.get(i + 1).doOverlap(newInterval);
-				i++;
-			}
-
-			i--;
-			updated.add(temp);
-		}
-		return deleteBlocksIfNeeded(updated);
-	}
-
-	private List<Interval> deleteBlocksIfNeeded(List<Interval> intervals) {
-		if (this.deletedBlocks.isEmpty())
-			return intervals;
-		Stack<Interval> updated = new Stack<>();
-		List<Interval> deleted = new ArrayList<>(this.deletedBlocks);
-		int deletedIndex = 0;
-		int intervalIndex = 0;
-		while (deletedIndex < deleted.size() && intervalIndex < intervals.size()) {
-			if (deleted.get(deletedIndex).isBefore(intervals.get(intervalIndex))) {
-				deletedIndex++;
-			}
-			if (deletedIndex < deleted.size() && deleted.get(deletedIndex).isAfter(intervals.get(intervalIndex))) {
-				updated.push(intervals.get(intervalIndex));
-				intervalIndex++;
-			}
-			if (deletedIndex < deleted.size() && intervalIndex < intervals.size()
-					&& deleted.get(deletedIndex).exactOverlap(intervals.get(intervalIndex))) {
-				updated.addAll(splitInterval(intervals.get(intervalIndex), deleted.get(deletedIndex)));
-				deletedIndex++;
-				intervalIndex++;
-				while (deletedIndex < deleted.size() && !updated.empty() && updated.peek().exactOverlap(deleted.get(deletedIndex))) {
-					updated.addAll(splitInterval(updated.pop(), deleted.get(deletedIndex)));
-					deletedIndex++;
-				}
-			}
-		}
-		while (intervalIndex < intervals.size()) {
-			updated.push(intervals.get(intervalIndex++));
-		}
-		return updated;
-	}
-
-	private List<Interval> splitIntervals(Interval interval, Set<Interval> deletedBlocks) {
-		Stack<Interval> splitted = new Stack<>();
-		splitted.push(interval);
-		for (Interval block : deletedBlocks) {
-			if (splitted.peek().exactOverlap(block)) {
-				splitted.addAll(splitInterval(splitted.pop(), block));
-			}
-		}
-		return new ArrayList<>(splitted);
-	}
-
-	private List<Interval> splitInterval(Interval interval, Interval block) {
-		List<Interval> splittedIntervals = new ArrayList<>();
-		if(interval.equals(block)) return splittedIntervals;
-		if (interval.start >= block.start)
-			splittedIntervals.add(new Interval(block.end, interval.end));
-		else if (interval.end <= block.end)
-			splittedIntervals.add(new Interval(interval.start, block.start));
-		else {
-			splittedIntervals.add(new Interval(interval.start, block.start));
-			splittedIntervals.add(new Interval(block.end, interval.end));
-		}
-		return splittedIntervals;
+		this.deletedBlocks = IntervalsUtilities.deleteBlockFromDisjointIntervals(this.deletedBlocks, i);
 	}
 
 	private void addToDisjointIntervals(Interval i) {
-		this.disjointIntervals = insert(this.disjointIntervals, i);
+		this.disjointIntervals = IntervalsUtilities.deleteBlocksFromDisjointIntervals(IntervalsUtilities.insertInSortedDisjointIntervals(this.disjointIntervals, i, true), this.deletedBlocks);
 	}
 
 	private void updateDisjointIntervals() {
-		List<Interval> reverse = new ArrayList<>(this.intervals.descendingSet());
-		this.disjointIntervals = mergeOverlappingIntervals(reverse);
+		this.disjointIntervals = IntervalsUtilities.deleteBlocksFromDisjointIntervals(
+				IntervalsUtilities.mergeOverlappingIntervals(new ArrayList<>(this.intervals)),
+				this.deletedBlocks);
 	}
 
-	private List<Interval> mergeOverlappingIntervals(List<Interval> mergedIntervals) {
-
-		int index = 0;
-		for (int i = 0; i < mergedIntervals.size(); i++) {
-			// If this is not first Interval and overlaps
-			// with the previous one
-			if (index != 0 && mergedIntervals.get(index - 1).doOverlap(mergedIntervals.get(i))) {
-				while (index != 0 && mergedIntervals.get(index - 1).doOverlap(mergedIntervals.get(i))) {
-					// Merge previous and current Intervals
-					Interval temp = new Interval();
-					temp.end = Math.max(mergedIntervals.get(index - 1).end, mergedIntervals.get(i).end);
-					temp.start = Math.min(mergedIntervals.get(index - 1).start, mergedIntervals.get(i).start);
-					mergedIntervals.set(index - 1, temp);
-					index--;
-				}
-			} else // Doesn't overlap with previous, add to
-					// solution
-				mergedIntervals.add(index, mergedIntervals.get(i));
-
-			index++;
-		}
-		mergedIntervals = mergedIntervals.subList(0, index);
-		Collections.reverse(mergedIntervals);
-		return deleteBlocksIfNeeded(mergedIntervals);
-	}
 }

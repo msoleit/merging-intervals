@@ -24,7 +24,7 @@ public class IntervalTree {
 	// Add an interval to the tree
 	public void add(Interval i) {
 		intervals.add(i);
-		//updateDeletedBlocks(i);
+		updateDeletedBlocks(i);
 		addToDisjointIntervals(i);
 	}
 
@@ -46,7 +46,7 @@ public class IntervalTree {
 	}
 
 	private void addToDisjointIntervals(Interval i) {
-		this.disjointIntervals = IntervalsUtilities.deleteBlocksFromDisjointIntervals(IntervalsUtilities.insertInSortedDisjointIntervals(this.disjointIntervals, i, true), this.deletedBlocks);
+		this.disjointIntervals = IntervalsUtilities.insertInSortedDisjointIntervals(this.disjointIntervals, i, true);
 	}
 
 	private void updateDisjointIntervals() {

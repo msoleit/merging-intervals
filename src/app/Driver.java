@@ -7,15 +7,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
-import java.util.TreeSet;
 import java.util.stream.Stream;
 
 public class Driver {
-	static IntervalTree tree = new IntervalTree();
-	static TreeSet<Interval> t = new TreeSet<>();
+	private static IntervalTree tree;
 	private static Scanner scanner = new Scanner(System.in);
 
-	public static void process(String input) {
+	private static void processInputStream(String input) {
 		try {
 			String[] args = input.split(" ");
 			int start = Integer.parseInt(args[1]);
@@ -57,10 +55,11 @@ public class Driver {
 				? MERGE_DISTANCE
 				: "0";
 		System.setProperty("MERGE_DISTANCE", MERGE_DISTANCE);
+		tree = new IntervalTree();
 		// read file into stream, try-with-resources
 		try (Stream<String> stream = Files.lines(Paths.get(fileName).toAbsolutePath())) {
 
-			stream.forEach(Driver::process);
+			stream.forEach(Driver::processInputStream);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -68,3 +67,4 @@ public class Driver {
 	}
 
 }
+

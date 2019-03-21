@@ -1,5 +1,9 @@
 # merging-intervals
 
+## To run : 
+The Driver class is the entry point to the application. 
+When run, it will prompt the user to enter the path of the input file (default is under src/resources folder in the project directory) and the merging distance (default is zero).
+
 ## Assumptions : 
 1. A deleted block can not be overwritten even by adding new intervals which overlaps with it.
 2. A deleted block will be neglected if it is smaller than or equal the merge distance between the intervals on its right and left which will be merged in that case. 

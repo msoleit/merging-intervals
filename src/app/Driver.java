@@ -13,7 +13,7 @@ public class Driver {
 	private static IntervalTree tree;
 	private static Scanner scanner = new Scanner(System.in);
 
-	private static void process(String input) {
+	private static void processInputStream(String input) {
 		try {
 			String[] args = input.split(" ");
 			int start = Integer.parseInt(args[1]);
@@ -59,7 +59,7 @@ public class Driver {
 		// read file into stream, try-with-resources
 		try (Stream<String> stream = Files.lines(Paths.get(fileName).toAbsolutePath())) {
 
-			stream.forEach(Driver::process);
+			stream.forEach(Driver::processInputStream);
 
 		} catch (IOException e) {
 			e.printStackTrace();

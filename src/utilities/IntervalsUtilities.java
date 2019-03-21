@@ -112,6 +112,22 @@ public final class IntervalsUtilities {
 		return (mergedIntervals);
 	}
 
+	public static Interval searchOverlap(List<Interval> disjointIntervals, Interval i) {
+		int low = 0;
+		int high = disjointIntervals.size() - 1;
+		while (low <= high) {
+			int middleIndex = (low + high) / 2;
+			Interval current = disjointIntervals.get(middleIndex);
+			if (current.exactOverlap(i))
+				return current;
+			else if (current.isBefore(i))
+				low = middleIndex + 1;
+			else
+				high = middleIndex - 1;
+		}
+		return null;
+	}
+
 	// delete blocks from a set of sorted disjoint intervals
 	public static List<Interval> deleteBlocksFromDisjointIntervals(List<Interval> sortedDisjointIntervals,
 			List<Interval> sortedDeletedBlocks) {
@@ -164,7 +180,7 @@ public final class IntervalsUtilities {
 		else if (interval.getEnd() <= block.getEnd())
 			splittedIntervals.add(new Interval(interval.getStart(), block.getStart()));
 		else if (block.length() <= Interval.MERGE_DISTANCE)
-			return Arrays.asList(interval);
+			splittedIntervals.add(interval);
 		else {
 			splittedIntervals.add(new Interval(interval.getStart(), block.getStart()));
 			splittedIntervals.add(new Interval(block.getEnd(), interval.getEnd()));
